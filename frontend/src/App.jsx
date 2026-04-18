@@ -17,9 +17,12 @@ export default function App() {
     setSources([]);
 
     try {
-      const response = await axios.get("http://127.0.0.1:8000/query", {
-        params: { question },
-      });
+      const response = await axios.get(
+        "https://medical-chatbot-groq.onrender.com/query",
+        {
+          params: { question },
+        }
+      );
 
       setAnswer(response.data.answer);
       setSources(response.data.sources);
