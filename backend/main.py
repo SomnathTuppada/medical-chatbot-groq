@@ -1,19 +1,18 @@
 from fastapi import FastAPI
-from backend.ingestion.pdf_loader import load_all_pdfs
-from backend.ingestion.pdf_loader import load_all_pdfs
-from backend.ingestion.text_splitter import split_text
-from backend.ingestion.pdf_loader import load_all_pdfs
-from backend.ingestion.text_splitter import split_text
-from backend.embeddings.embedder import Embedder
-from backend.vectorstore.pinecone_client import PineconeClient
-from backend.embeddings.embedder import Embedder
-from backend.ingestion.pdf_loader import load_all_pdfs
-from backend.ingestion.text_splitter import split_text
-from backend.rag.retriever import Retriever
-from backend.rag.retriever import Retriever
-from backend.rag.generator import Generator
+from ingestion.pdf_loader import load_all_pdfs
+from ingestion.pdf_loader import load_all_pdfs
+from ingestion.text_splitter import split_text
+from ingestion.pdf_loader import load_all_pdfs
+from ingestion.text_splitter import split_text
+from embeddings.embedder import Embedder
+from vectorstore.pinecone_client import PineconeClient
+from embeddings.embedder import Embedder
+from ingestion.pdf_loader import load_all_pdfs
+from ingestion.text_splitter import split_text
+from rag.retriever import Retriever
+from rag.retriever import Retriever
+from rag.generator import Generator
 from fastapi.middleware.cors import CORSMiddleware
-
 
 
 

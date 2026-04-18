@@ -1,5 +1,5 @@
 from groq import Groq
-from backend.config import settings
+from config import settings
 
 
 class Generator:

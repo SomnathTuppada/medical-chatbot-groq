@@ -1,5 +1,5 @@
-from backend.embeddings.embedder import Embedder
-from backend.vectorstore.pinecone_client import PineconeClient
+from embeddings.embedder import Embedder
+from vectorstore.pinecone_client import PineconeClient
 
 
 class Retriever:

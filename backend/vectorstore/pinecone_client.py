@@ -1,5 +1,5 @@
 from pinecone import Pinecone, ServerlessSpec
-from backend.config import settings
+from config import settings
 
 
 class PineconeClient:
