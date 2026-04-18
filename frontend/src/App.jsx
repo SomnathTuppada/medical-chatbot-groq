@@ -72,6 +72,9 @@ export default function App() {
           <button style={styles.button} onClick={askQuestion}>
             Ask
           </button>
+          <div style={styles.footer}>
+            Built by Somnath Tuppada
+          </div>
         </div>
 
       </div>
@@ -162,5 +165,13 @@ const styles = {
 
   error: {
     color: "#ef4444",
+  },
+  footer: {
+    position: "fixed",
+    bottom: "10px",
+    right: "20px",
+    color: "#9ca3af",
+    fontSize: "14px",
+    opacity: 0.8,
   },
 };
