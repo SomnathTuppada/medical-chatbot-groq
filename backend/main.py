@@ -18,6 +18,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Medical RAG Chatbot")
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
