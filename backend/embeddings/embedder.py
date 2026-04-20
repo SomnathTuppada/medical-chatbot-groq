@@ -1,11 +1,28 @@
-from sentence_transformers import SentenceTransformer
+import requests
+from backend.config import settings
 
 class Embedder:
     def __init__(self):
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.api_url = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+        self.headers = {
+            "Authorization": f"Bearer {settings.HF_TOKEN}"
+        }
 
-    def embed_texts(self, texts: list[str]) -> list[list[float]]:
-        return self.model.encode(texts, show_progress_bar=False).tolist()
+    def embed_texts(self, texts):
+        embeddings = []
+        for text in texts:
+            response = requests.post(
+                self.api_url,
+                headers=self.headers,
+                json={"inputs": text}
+            )
+            embeddings.append(response.json()[0])
+        return embeddings
 
-    def embed_query(self, query: str) -> list[float]:
-        return self.model.encode(query, show_progress_bar=False).tolist()
+    def embed_query(self, query):
+        response = requests.post(
+            self.api_url,
+            headers=self.headers,
+            json={"inputs": query}
+        )
+        return response.json()[0]
