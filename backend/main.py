@@ -69,7 +69,13 @@ def query_medical_bot(question: str):
         # STEP 1
         print("➡️ Calling retriever...")
         contexts = retriever.retrieve(question)
-        print("✅ Retriever done")
+
+        if not contexts:
+            return {
+                "question": question,
+                "answer": "No relevant information found or system is warming up.",
+                "sources": []
+            }
 
         print("📚 Retrieved:", len(contexts))
 

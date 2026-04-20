@@ -9,21 +9,48 @@ class Retriever:
         self.top_k = top_k
 
     def retrieve(self, query: str) -> list[dict]:
-        query_vector = self.embedder.embed_query(query)
-        index = self.pinecone.get_index()
+        try:
+            # 🔥 STEP 1 — Get embedding
+            print("🔍 Generating embedding...")
+            query_vector = self.embedder.embed_query(query)
 
-        response = index.query(
-            vector=query_vector,
-            top_k=self.top_k,
-            include_metadata=True
-        )
+            if query_vector is None:
+                print("❌ Embedding failed")
+                return []
 
-        results = []
-        for match in response["matches"]:
-            results.append({
-                "score": match["score"],
-                "text": match["metadata"]["text"],
-                "source": match["metadata"]["source"]
-            })
+            print("✅ Embedding generated")
 
-        return results
+            # 🔥 STEP 2 — Query Pinecone
+            index = self.pinecone.get_index()
+
+            print("📡 Querying Pinecone...")
+            response = index.query(
+                vector=query_vector,
+                top_k=self.top_k,
+                include_metadata=True
+            )
+
+            print("✅ Pinecone response received")
+
+            # 🔥 STEP 3 — Parse safely
+            matches = response.get("matches", [])
+
+            if not matches:
+                print("⚠️ No matches found")
+                return []
+
+            results = []
+            for match in matches:
+                metadata = match.get("metadata", {})
+
+                results.append({
+                    "score": match.get("score", 0),
+                    "text": metadata.get("text", ""),
+                    "source": metadata.get("source", "unknown")
+                })
+
+            return results
+
+        except Exception as e:
+            print("🔥 RETRIEVER ERROR:", repr(e))
+            return []

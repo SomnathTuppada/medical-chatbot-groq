@@ -8,21 +8,28 @@ class Embedder:
             "Authorization": f"Bearer {settings.HF_TOKEN}"
         }
 
-    def embed_texts(self, texts):
-        embeddings = []
-        for text in texts:
+    def embed_query(self, query):
+        try:
             response = requests.post(
                 self.api_url,
                 headers=self.headers,
-                json={"inputs": text}
+                json={"inputs": query},
+                timeout=10
             )
-            embeddings.append(response.json()[0])
-        return embeddings
 
-    def embed_query(self, query):
-        response = requests.post(
-            self.api_url,
-            headers=self.headers,
-            json={"inputs": query}
-        )
-        return response.json()[0]
+            print("🔍 HF RAW:", response.text[:200])
+
+            if response.status_code != 200:
+                print("❌ HF ERROR:", response.status_code)
+                return None
+
+            if not response.text:
+                print("❌ Empty HF response")
+                return None
+
+            data = response.json()
+            return data[0]
+
+        except Exception as e:
+            print("🔥 EMBEDDING ERROR:", e)
+            return None
