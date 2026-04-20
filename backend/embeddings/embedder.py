@@ -1,5 +1,7 @@
 import requests
 from config import settings
+from sentence_transformers import SentenceTransformer
+
 
 class Embedder:
     def __init__(self):
@@ -35,3 +37,14 @@ class Embedder:
         except Exception as e:
             print("🔥 EMBEDDING ERROR:", e)
             return None
+        
+class Embedder:
+    def __init__(self):
+        # 🔥 lightweight model (~80MB)
+        self.model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
+
+    def embed_query(self, query):
+        return self.model.encode(query).tolist()
+
+    def embed_texts(self, texts):
+        return self.model.encode(texts).tolist()

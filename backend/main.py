@@ -35,7 +35,7 @@ def load_models():
 
     try:
         embedder = Embedder()
-        retriever = Retriever(top_k=3)
+        retriever = Retriever(top_k=2)
         generator = Generator()
 
         print("✅ Models loaded successfully")
