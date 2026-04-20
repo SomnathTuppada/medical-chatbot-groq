@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from ingestion.pdf_loader import load_all_pdfs
-from ingestion.pdf_loader import load_all_pdfs
 from ingestion.text_splitter import split_text
 from ingestion.pdf_loader import load_all_pdfs
 from ingestion.text_splitter import split_text
@@ -20,19 +19,15 @@ app = FastAPI(title="Medical RAG Chatbot")
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "Medical RAG backend running"}
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/health")
-def health():
-    return {"status": "Medical RAG backend running"}
 
 
 @app.get("/debug/load-pdfs")
@@ -143,21 +138,35 @@ def debug_retrieve(query: str):
 
 @app.get("/query")
 def query_medical_bot(question: str):
-    retriever = Retriever(top_k=5)
-    generator = Generator()
+    try:
+        print("Received question:", question)
 
-    contexts = retriever.retrieve(question)
-    answer = generator.generate_answer(question, contexts)
+        retriever = Retriever(top_k=3)  # 🔥 reduce load
+        generator = Generator()
 
-    return {
-        "question": question,
-        "answer": answer,
-        "sources": [
-            {"source": c["source"], "score": c["score"]}
-            for c in contexts
-        ]
-    }
-0
+        contexts = retriever.retrieve(question)
+
+        # 🔥 CRITICAL: limit context size
+        contexts = contexts[:3]
+
+        answer = generator.generate_answer(question, contexts)
+
+        return {
+            "question": question,
+            "answer": answer,
+            "sources": [
+                {"source": c["source"], "score": c["score"]}
+                for c in contexts
+            ]
+        }
+
+    except Exception as e:
+        print("ERROR:", e)
+        return {
+            "question": question,
+            "answer": "Server error occurred. Please try again.",
+            "sources": []
+        }
 
 
 
