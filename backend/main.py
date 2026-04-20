@@ -9,14 +9,9 @@ from vectorstore.pinecone_client import PineconeClient
 from rag.retriever import Retriever
 from rag.generator import Generator
 
-# Initialize once 
-embedder = Embedder()
-retriever = Retriever(top_k=3)
-generator = Generator()
-
 app = FastAPI(title="Medical RAG Chatbot")
 
-# CORS 
+# 🌐 CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,9 +20,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 🔥 GLOBALS (start empty)
+embedder = None
+retriever = None
+generator = None
+
+
+# 🚀 LOAD ON STARTUP (IMPORTANT FIX)
+@app.on_event("startup")
+def load_models():
+    global embedder, retriever, generator
+
+    print("🚀 Loading models...")
+
+    try:
+        embedder = Embedder()
+        retriever = Retriever(top_k=3)
+        generator = Generator()
+
+        print("✅ Models loaded successfully")
+
+    except Exception as e:
+        print("🔥 Startup error:", e)
+
+
 @app.get("/health")
 def health():
     return {"status": "Medical RAG backend running"}
+
 
 @app.get("/debug/check-path")
 def debug_check_path():
@@ -38,25 +58,37 @@ def debug_check_path():
         "files_found": [f.name for f in folder.glob("*")]
     }
 
+
 @app.get("/query")
 def query_medical_bot(question: str):
+    global retriever, generator
+
+    # ⛔ If still loading
+    if retriever is None or generator is None:
+        return {
+            "question": question,
+            "answer": "Server is warming up. Please wait a few seconds and retry.",
+            "sources": []
+        }
+
     try:
         print("📩 Question:", question)
 
         contexts = retriever.retrieve(question)
         print("📚 Retrieved:", len(contexts))
 
-        # 🔥 REDUCE LOAD (CRITICAL)
+        # 🔥 LIMIT CONTEXT COUNT
         contexts = contexts[:2]
 
-        # 🔥 Trim context text (VERY IMPORTANT)
-        trimmed_contexts = []
-        for c in contexts:
-            trimmed_contexts.append({
-                "text": c["text"][:300],   # limit size
+        # 🔥 TRIM CONTEXT SIZE (VERY IMPORTANT FOR MEMORY)
+        trimmed_contexts = [
+            {
+                "text": c["text"][:300],
                 "source": c["source"],
                 "score": c["score"]
-            })
+            }
+            for c in contexts
+        ]
 
         answer = generator.generate_answer(question, trimmed_contexts)
 
@@ -76,6 +108,6 @@ def query_medical_bot(question: str):
 
         return {
             "question": question,
-            "answer": "Server is warming up. Please try again.",
+            "answer": "Server error occurred. Try again.",
             "sources": []
         }
