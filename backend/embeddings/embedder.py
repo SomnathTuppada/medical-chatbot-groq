@@ -3,7 +3,7 @@ from config import settings
 
 class Embedder:
     def __init__(self):
-        self.api_url = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+        self.api_url = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
         self.headers = {
             "Authorization": f"Bearer {settings.HF_TOKEN}"
         }
@@ -28,7 +28,12 @@ class Embedder:
                 return None
 
             data = response.json()
-            return data[0]
+
+            # 🔥 HF returns nested list sometimes
+            if isinstance(data, list):
+                return data[0]
+
+            return data
 
         except Exception as e:
             print("🔥 EMBEDDING ERROR:", e)
