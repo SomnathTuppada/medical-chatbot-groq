@@ -10,26 +10,23 @@ class Embedder:
 
     def embed_query(self, query):
         try:
+            print("🌍 Calling HF URL:", self.api_url)
+
             response = requests.post(
-                self.api_url,
+                url=self.api_url,   # 🔥 explicit
                 headers=self.headers,
                 json={"inputs": query},
                 timeout=10
             )
 
+            print("📡 Status Code:", response.status_code)
             print("🔍 HF RAW:", response.text[:200])
 
             if response.status_code != 200:
-                print("❌ HF ERROR:", response.status_code)
-                return None
-
-            if not response.text:
-                print("❌ Empty HF response")
                 return None
 
             data = response.json()
 
-            # 🔥 HF returns nested list sometimes
             if isinstance(data, list):
                 return data[0]
 
