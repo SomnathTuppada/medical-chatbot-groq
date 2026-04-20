@@ -12,5 +12,7 @@ class Settings:
     PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
     PINECONE_ENV = os.getenv("PINECONE_ENV")
     PINECONE_INDEX = os.getenv("PINECONE_INDEX")
+    HF_TOKEN = os.getenv("HF_TOKEN")
+
 
 settings = Settings()

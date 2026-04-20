@@ -1,5 +1,5 @@
 import requests
-from backend.config import settings
+from config import settings
 
 class Embedder:
     def __init__(self):
