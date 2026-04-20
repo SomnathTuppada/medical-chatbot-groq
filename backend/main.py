@@ -63,51 +63,36 @@ def debug_check_path():
 def query_medical_bot(question: str):
     global retriever, generator
 
-    # ⛔ If still loading
-    if retriever is None or generator is None:
-        return {
-            "question": question,
-            "answer": "Server is warming up. Please wait a few seconds and retry.",
-            "sources": []
-        }
-
     try:
         print("📩 Question:", question)
 
+        # STEP 1
+        print("➡️ Calling retriever...")
         contexts = retriever.retrieve(question)
+        print("✅ Retriever done")
+
         print("📚 Retrieved:", len(contexts))
 
-        # 🔥 LIMIT CONTEXT COUNT
         contexts = contexts[:2]
 
-        # 🔥 TRIM CONTEXT SIZE (VERY IMPORTANT FOR MEMORY)
-        trimmed_contexts = [
-            {
-                "text": c["text"][:300],
-                "source": c["source"],
-                "score": c["score"]
-            }
-            for c in contexts
-        ]
-
-        answer = generator.generate_answer(question, trimmed_contexts)
-
-        print("✅ Answer generated")
+        # STEP 2
+        print("➡️ Calling generator...")
+        answer = generator.generate_answer(question, contexts)
+        print("✅ Generator done")
 
         return {
             "question": question,
             "answer": answer,
             "sources": [
                 {"source": c["source"], "score": c["score"]}
-                for c in trimmed_contexts
+                for c in contexts
             ]
         }
 
     except Exception as e:
-        print("🔥 ERROR:", e)
-
+        print("🔥 FULL ERROR:", repr(e))
         return {
             "question": question,
-            "answer": "Server error occurred. Try again.",
+            "answer": "Server error occurred.",
             "sources": []
         }
